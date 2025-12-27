@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stackly Automotive</title>
+
+<style>
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Poppins",sans-serif;
+}
+
+body{
+  background:#f4f9ff;
+}
+
+/* ================= LOADER ================= */
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #5d2bff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+  animation: fadeOut 1.2s ease 1s forwards;
+}
+
+.loader-content {
+  text-align: center;
+  position: relative;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+  z-index: 1;
+}
+
+#loader p {
+  color: white;
+  margin-top: 15px;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  animation: fadeText 3s infinite alternate;
+}
+
+/* ANIMATIONS */
+@keyframes pulse {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+  70% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.2; }
+  100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+}
+
+@keyframes fadeText {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+
+/* ================= NAVBAR ANIMATED ================= */
+.navbar{
+  width:100%;
+  background: linear-gradient(90deg, #4b2cff, #885cff, #c56ffd);
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:9999;
+  box-shadow:0 4px 25px rgba(0,0,0,0.25);
+
+  transform: translateY(-40px);
+  opacity:0;
+  animation: navbarDrop 0.8s ease forwards;
+}
+
+@keyframes navbarDrop {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* LOGO animation */
+.logo-area img{
+  height:50px;
+  width:auto;
+  opacity:0;
+  animation: logoFade 1s ease 0.4s forwards;
+}
+
+@keyframes logoFade {
+  from { transform: scale(0.6); opacity:0; }
+  to   { transform: scale(1); opacity:1; }
+}
+
+/* DESKTOP MENU */
+.nav-menu{
+  display:flex;
+  gap:25px;
+  list-style:none;
+}
+
+.nav-menu li a{
+  color:white;
+  text-decoration:none;
+  font-size:16px;
+  padding:8px 12px;
+  border-radius:8px;
+  transition:.3s;
+}
+
+/* GLOW HOVER */
+.nav-menu li a:hover{
+  background:#ffffff26;
+  box-shadow:0 0 10px #ffffff77;
+  transform: translateY(-3px);
+}
+
+/* DROPDOWN */
+.dropdown{
+  position:relative;
+}
+
+.dropdown-menu{
+  position:absolute;
+  top:42px;
+  left:0;
+  background:#0b2447;
+  width:160px;
+  border-radius:8px;
+  list-style:none;
+  padding:10px 0;
+  border:1px solid rgba(255,255,255,0.2);
+  display:none;
+  animation: dropFade .35s ease;
+}
+
+@keyframes dropFade {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.dropdown.open .dropdown-menu{
+  display:block;
+}
+
+/* HAMBURGER */
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  cursor:pointer;
+  opacity:0;
+  animation: fadeIn 1s ease 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity:1; }
+}
+
+.hamburger span{
+  width:28px;
+  height:3px;
+  background:white;
+  border-radius:4px;
+  transition:.3s;
+}
+
+/* MOBILE MENU */
+@media(max-width:768px){
+
+  .hamburger{
+    display:flex;
+  }
+
+  .nav-menu{
+    position:fixed;
+    top:70px;
+    right:-100%;
+    width:260px;
+    background:#0b2447;
+    height:calc(100vh - 70px);
+    flex-direction:column;
+    padding-top:15px;
+    padding-bottom:30px;
+    box-shadow:-4px 0 18px rgba(0,0,0,0.3);
+    transition:0.4s ease;
+  }
+
+  .nav-menu.active{
+    right:0;
+  }
+
+  .nav-menu li{
+    width:100%;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+
+    /* Animate each link (stagger effect) */
+    opacity:0;
+    animation: slideIn 0.6s ease forwards;
+  }
+
+  @keyframes slideIn {
+    0% { transform:translateX(50px); opacity:0; }
+    100% { transform:translateX(0); opacity:1; }
+  }
+
+  .nav-menu li a{
+    display:block;
+    width:100%;
+    padding:15px 8px;
+    font-size:18px;
+  }
+
+  .dropdown-menu{
+    position:relative;
+    width:100%;
+    border-radius:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOADER ===== -->
+<div id="loader">
+  <div class="loader-content">
+    <div class="pulse-ring"></div>
+    <p>Loading Automotive...</p>
+  </div>
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+
+  <div class="logo-area">
+    <img src="Screenshot (7) (1) (1).webp" alt="Logo">
+  </div>
+
+ <ul class="nav-menu" id="navMenu">
+
+  <li class="dropdown">
+    <a href="#" class="dropdown-btn">Home ▾</a>
+    <ul class="dropdown-menu">
+      <li><a href="index.html">Home 1</a></li>
+      <li><a href="Home.html">Home 2</a></li>
+    </ul>
+  </li>
+
+  <li><a href="dashboard.html">Dashboard</a></li>
+  <li><a href="services.html">Services</a></li>
+   
+
+  <li><a href="about.html">About</a></li>
+  <li><a href="blog.html">Blog</a></li>
+<li><a href="signup.html">Signin</a></li>
+</ul>
+
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+
+</nav>
+
+<!-- ================= JS ================= -->
+<script>
+/* MOBILE MENU TOGGLE */
+const hamburger = document.getElementById("hamburger");
+const navMenu = document.getElementById("navMenu");
+
+hamburger.addEventListener("click", () => {
+  navMenu.classList.toggle("active");
+});
+
+/* DROPDOWNS OPEN */
+document.querySelectorAll(".dropdown-btn").forEach(btn => {
+  btn.addEventListener("click", function(e){
+    e.preventDefault();
+    this.parentElement.classList.toggle("open");
+  });
+});
+</script>
+
+
+<style>
+/* ================= RESET ================= */
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+body{
+  background:#020617;
+  color:#e5e7eb;
+  overflow-x:hidden;
+}
+
+/* ================= GRADIENT BACKGROUND ================= */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 10% 20%, #22d3ee44, transparent 40%),
+    radial-gradient(circle at 80% 30%, #22c55e44, transparent 40%),
+    radial-gradient(circle at 50% 80%, #7c3aed44, transparent 40%);
+  animation:hue 14s infinite alternate;
+  z-index:-1;
+}
+@keyframes hue{
+  from{filter:hue-rotate(0deg);}
+  to{filter:hue-rotate(70deg);}
+}
+
+/* ================= HERO ================= */
+.hero{
+  min-height:95vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.hero-box{
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(25px);
+  border-radius:32px;
+  padding:80px 60px;
+  box-shadow:0 40px 120px rgba(0,0,0,.9);
+  animation:float 6s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-20px);}
+}
+.hero h1{
+  font-size:54px;
+  background:linear-gradient(90deg,#22d3ee,#22c55e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero p{
+  margin-top:18px;
+  font-size:18px;
+  opacity:.9;
+}
+.hero a{
+  margin-top:35px;
+  display:inline-block;
+  padding:16px 48px;
+  border-radius:40px;
+  background:linear-gradient(90deg,#22d3ee,#22c55e);
+  color:#020617;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 0 45px #22d3ee;
+  transition:.5s;
+}
+.hero a:hover{
+  transform:scale(1.15);
+  box-shadow:0 0 90px #22c55e;
+}
+
+/* ================= SERVICES ================= */
+.services{
+  max-width:1400px;
+  margin:auto;
+  padding:120px 20px;
+}
+.section-title{
+  text-align:center;
+  font-size:40px;
+  margin-bottom:70px;
+  background:linear-gradient(90deg,#22d3ee,#22c55e,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.service-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:35px;
+}
+
+.service{
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(18px);
+  padding:40px;
+  border-radius:26px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  position:relative;
+  overflow:hidden;
+  transition:.6s;
+}
+.service::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,transparent,#22d3ee55,transparent);
+  transform:translateX(-120%);
+  transition:.7s;
+}
+.service:hover::before{
+  transform:translateX(120%);
+}
+.service:hover{
+  transform:translateY(-15px) scale(1.05);
+  box-shadow:0 60px 140px rgba(34,211,238,.6);
+}
+.service span{
+  font-size:48px;
+}
+.service h3{
+  margin:15px 0 10px;
+  font-size:22px;
+}
+.service p{
+  font-size:15px;
+  opacity:.85;
+}
+
+/* ================= STATS ================= */
+.stats{
+  padding:100px 20px;
+}
+.stats-grid{
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:30px;
+}
+.stat{
+  background:rgba(255,255,255,.07);
+  padding:45px;
+  border-radius:22px;
+  text-align:center;
+  animation:pulse 3s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 25px #22d3ee;}
+  50%{box-shadow:0 0 55px #22c55e;}
+  100%{box-shadow:0 0 25px #22d3ee;}
+}
+.stat h2{
+  font-size:42px;
+  color:#22c55e;
+}
+
+/* ================= CTA ================= */
+.cta{
+  padding:120px 20px;
+  text-align:center;
+}
+.cta h2{
+  font-size:42px;
+}
+.cta a{
+  margin-top:30px;
+  display:inline-block;
+  padding:18px 60px;
+  border-radius:50px;
+  background:linear-gradient(90deg,#7c3aed,#22d3ee);
+  color:white;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 0 70px #7c3aed;
+  transition:.6s;
+}
+.cta a:hover{
+  transform:rotate(-2deg) scale(1.2);
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:600px){
+  .hero h1{font-size:34px;}
+  .hero-box{padding:50px 30px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-box">
+    <h1>Elite Automotive Care</h1>
+    <p>Luxury • Precision • Trusted Vehicle Services</p>
+    <a href="404.html">Book Premium Service</a>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services">
+  <h2 class="section-title">Complete Automotive Services</h2>
+
+  <div class="service-grid">
+    <div class="service"><span>🚗</span><h3>General Car Repair</h3><p>Engine, brakes, suspension & electronics.</p></div>
+    <div class="service"><span>🛠️</span><h3>Engine Diagnostics</h3><p>Computerized fault detection & tuning.</p></div>
+    <div class="service"><span>🛢️</span><h3>Oil & Filter Change</h3><p>Premium oils for long engine life.</p></div>
+    <div class="service"><span>❄️</span><h3>AC Service</h3><p>Cooling repair, gas refill & climate control.</p></div>
+    <div class="service"><span>🔋</span><h3>Battery Replacement</h3><p>Instant battery testing & replacement.</p></div>
+    <div class="service"><span>🛞</span><h3>Tyre & Wheel Care</h3><p>Alignment, balancing & puncture repair.</p></div>
+    <div class="service"><span>✨</span><h3>Ceramic Coating</h3><p>Mirror finish paint protection.</p></div>
+    <div class="service"><span>🚿</span><h3>Car Wash</h3><p>Foam wash, interior vacuum & polish.</p></div>
+    <div class="service"><span>🧼</span><h3>Interior Detailing</h3><p>Seats, dashboard & odor removal.</p></div>
+    <div class="service"><span>🧯</span><h3>Brake Service</h3><p>Disc, pad replacement & safety check.</p></div>
+    <div class="service"><span>⚡</span><h3>Electrical Repairs</h3><p>Lights, sensors, wiring & ECU.</p></div>
+    <div class="service"><span>🚘</span><h3>Roadside Assistance</h3><p>24/7 breakdown & towing support.</p></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat"><h2>25K+</h2><p>Vehicles Serviced</p></div>
+    <div class="stat"><h2>99%</h2><p>Customer Satisfaction</p></div>
+    <div class="stat"><h2>18+</h2><p>Years of Excellence</p></div>
+    <div class="stat"><h2>24/7</h2><p>Support Availability</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Clients Love Our Premium Experience</h2>
+  <a href="404.html">📞 Contact Now</a>
+</section>
+
+</body>
+</html>
+
+
+</html>
+
+<style>
+/* ================= FOOTER START ================= */
+
+footer{
+ background: linear-gradient(180deg, #1e1e3f, #342e6a, #4e2b8c);
+
+
+  color:#fff;
+  padding:70px 6%;
+  margin-top:80px;
+  position:relative;
+  overflow:hidden;
+  font-family:"Poppins",sans-serif;
+}
+
+/* Soft glow */
+footer::before{
+  content:"";
+  position:absolute;
+  top:-120px;
+  left:0;
+  width:120%;
+  height:220px;
+ 
+}
+
+
+/* GRID LAYOUT FIXED */
+.footer-container{
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:50px;
+  position:relative;
+  z-index:2;
+}
+
+/* LEFT */
+.footer-left img{
+  height:58px;
+  margin-bottom:12px;
+  object-fit:contain;
+}
+
+.footer-left p{
+  opacity:0.85;
+  margin:12px 0 18px;
+  line-height:1.6;
+  font-size:14px;
+  max-width:280px;
+}
+
+/* SOCIAL ICONS */
+.social-icons{
+  display:flex;
+  gap:14px;
+  margin-top:12px;
+}
+.social-icons a{
+  height:42px;width:42px;
+  border-radius:50%;
+  background:#ffffff20;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:.3s;
+}
+.social-icons a:hover{
+  background:#00eaff;
+  transform:translateY(-6px) scale(1.1);
+}
+.social-icons img{
+  height:20px;width:20px;
+}
+
+/* CENTER LINKS */
+.footer-links h3,
+.footer-contact h3{
+  margin-bottom:16px;
+  font-size:22px;
+  color:#00eaff;
+}
+
+.footer-links a{
+  display:block;
+  text-decoration:none;
+  color:#cbd5e1;
+  margin:6px 0;
+  font-size:15px;
+  transition:.3s;
+}
+.footer-links a:hover{
+  transform:translateX(6px);
+  color:#00eaff;
+}
+
+/* RIGHT CONTACT */
+.footer-contact p{
+  margin:6px 0;
+  opacity:.9;
+  font-size:15px;
+}
+
+/* SUBSCRIBE */
+.subscribe-box{
+  margin-top:16px;
+  display:flex;
+  width:100%;
+  max-width:320px;
+}
+.subscribe-box input{
+  flex:1;
+  padding:12px 14px;
+  background:#ffffff12;
+  border:none;
+  border-radius:6px 0 0 6px;
+  color:white;
+  outline:none;
+}
+.subscribe-box button{
+  padding:12px 20px;
+  background:#00eaff;
+  border:none;
+  color:#001;
+  font-weight:700;
+  border-radius:0 6px 6px 0;
+  cursor:pointer;
+}
+
+/* BOTTOM COPYRIGHT */
+.footer-bottom{
+  text-align:center;
+  margin-top:40px;
+  padding-top:18px;
+  border-top:1px solid #1e293b;
+  opacity:.8;
+  font-size:14px;
+}
+
+/* MOBILE VIEW FIX */
+/* MOBILE VIEW FIX */
+@media(max-width:900px){
+  
+  .footer-container{
+    grid-template-columns:1fr;
+    gap:45px;
+    text-align:center;
+  }
+
+  /* Left section */
+  .footer-left p{
+    margin:auto;
+  }
+
+  .social-icons{
+    justify-content:center;
+  }
+
+  /* QUICK LINKS */
+  .footer-links{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;   /* center block */
+  }
+
+  .footer-links h3{
+    text-align:center;
+    width:100%;
+  }
+
+  .footer-links a{
+    width:100%;
+    max-width:220px;      /* keeps good width */
+    text-align:start;     /* TEXT LEFT */
+    margin:4px 0;
+    padding-left:0;
+    margin-left: 130px;
+  }
+
+  /* Contact section */
+  .footer-contact{
+    text-align:center;
+  }
+
+  /* Subscribe input responsiveness */
+  .subscribe-box{
+    flex-direction:column;
+    max-width:none;
+  }
+  .subscribe-box input{
+    width:100%;
+    border-radius:6px;
+    margin-bottom:10px;
+  }
+  .subscribe-box button{
+    width:100%;
+    border-radius:6px;
+  }
+}
+
+</style>
+
+<footer>
+  <div class="footer-container">
+
+    <!-- LEFT -->
+    <div class="footer-left">
+      <img src="Screenshot (7) (1) (1).webp" alt="Company Logo">
+      <p>Our Automotive platform provides customers with 24/7 access to essential financial services...</p>
+
+      <div class="social-icons">
+        <a href="404.html"><img src="facebook.webp" alt="Facebook"></a>
+        <a href="404.html"><img src="twitter-logo.webp" alt="Twitter"></a>
+        <a href="404.html"><img src="linkedin.webp" alt="LinkedIn"></a>
+        <a href="404.html"><img src="instagram.webp" alt="Instagram"></a>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="footer-links">
+      <h3>Quick Links</h3>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+     <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="blog.html">Blog</a>
+      <a href="signup.html">Signin</a>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="footer-contact">
+      <h3>Contact Us</h3>
+      <p>📍 Bengaluru, Karnataka</p>
+      <p>📞 +91 98765 43210</p>
+      <p>✉ support@stacklyautomotive.com</p>
+
+      <form action="404.html" method="get" class="subscribe-box">
+        <input type="email" name="email" placeholder="Enter your email" required>
+        <button type="submit">Join</button>
+      </form>
+    </div>
+
+  </div>
+
+  <p class="footer-bottom">© 2025 Stackly Automotive. All Rights Reserved.</p>
+</footer>
+
+<!-- ================= FOOTER END ================= -->
